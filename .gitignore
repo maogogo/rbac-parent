@@ -1,0 +1,9 @@
+target/
+logs/
+*/target/
+*/project/
+*/bin/
+*/.cache-main
+*/.classpath
+*/.project
+*/.settings/
