@@ -12,13 +12,11 @@ object Dependencies {
   //val slickVersion = "3.1.1"
   val configVersion = "1.3.0"
   val finatraVersion = "2.1.6"
-  val injectVersion = "2.1.5"
+  val injectVersion = "2.1.6"
   val serverVersion = "1.21.0"
   val guiceVersion = "4.0.1"
   val mysqlVersion = "6.0.3"
   val json4sVersion = "3.4.0"
-  val jacksonCoreVersion = "2.8.0"
-  val jacksonModuleVersion = "2.8.0.rc2"
 
   val repositories = Seq(
     Resolver.sonatypeRepo("snapshots"),
@@ -43,28 +41,33 @@ object Dependencies {
   )
 
   val twttrDependency = Seq(
-    "com.twitter" %% "finagle-core" % "6.36.0",
-    "com.twitter" %% "finagle-thrift" % "6.36.0",
-    "com.twitter" %% "finagle-thriftmux" % "6.36.0",
-    "com.twitter" %% "finagle-stats" % "6.36.0",
-    "com.twitter" %% "finagle-serversets" % "6.36.0",
-    "com.twitter.inject" %% "inject-core" % "2.1.6",
-    "com.twitter.inject" %% "inject-server" % "2.1.6",
-    "com.twitter.inject" %% "inject-thrift-client" % "2.1.6"
+    "com.twitter" %% "twitter-server" % serverVersion,
+    "com.twitter" %% "finagle-core" % finagleVersion,
+    "com.twitter" %% "finagle-thrift" % finagleVersion,
+    "com.twitter" %% "finagle-thriftmux" % finagleVersion,
+    "com.twitter" %% "finagle-stats" % finagleVersion,
+    "com.twitter" %% "finagle-serversets" % finagleVersion,
+    "com.twitter.inject" %% "inject-core" % injectVersion,
+    "com.twitter.inject" %% "inject-server" % injectVersion,
+    "com.twitter.inject" %% "inject-thrift-client" % injectVersion
   )
 
   val finchDependency = Seq (
-    "com.github.finagle" %% "finch-core" % "0.10.0",
-    "com.github.finagle" %% "finch-oauth2" % "0.10.0",
-    "com.github.finagle" %% "finch-json4s" % "0.10.0"
+    "com.github.finagle" %% "finch-core" % finchVersion,
+    "com.github.finagle" %% "finch-oauth2" % finchVersion,
+    "com.github.finagle" %% "finch-json4s" % finchVersion
+  )
+
+  val mysqlDependency = Seq(
+    "com.twitter" %% "finagle-mysql" % finagleVersion,
+    "mysql" % "mysql-connector-java" % mysqlVersion
   )
 
   val thriftDependency = Seq(
-    "org.apache.thrift" % "libthrift" % "0.9.3",
-    "com.twitter" %% "twitter-server" % "1.21.0",
-    "com.twitter" %% "scrooge-core" % "4.8.0",
+    "org.apache.thrift" % "libthrift" % thriftVersion,
+    "com.twitter" %% "scrooge-core" % scroogeVersion,
     "com.twitter" %% "scrooge-runtime" % "4.5.0",
-    "com.twitter" %% "scrooge-serializer" % "4.8.0"
+    "com.twitter" %% "scrooge-serializer" % scroogeVersion
   )
 
 }

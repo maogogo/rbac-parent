@@ -20,9 +20,9 @@ object Main extends TwitterServer {
   override def modules = Seq(ServicesModule)
 
   lazy val sign = s"""
-${"*" * 50}
-    server : ${adminPort} start
-${"*" * 50} """
+${"*" * 80}
+    RPC: ${adminPort} started
+${"*" * 80} """
 
   override def postWarmup() {
     val services = ServicesModule.services(injector)

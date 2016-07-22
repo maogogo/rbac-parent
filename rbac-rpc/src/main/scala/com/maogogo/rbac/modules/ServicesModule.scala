@@ -6,6 +6,12 @@ import com.maogogo.rbac.thrift._
 import com.twitter.inject.{ TwitterModule, Logging }
 import com.maogogo.rbac.organization._
 import com.typesafe.config._
+import com.twitter.finagle.exp.Mysql
+import com.twitter.finagle.client.DefaultPool
+import com.twitter.finagle.exp.mysql.{ Client, Transactions }
+import com.maogogo.rbac.common.timer._
+import com.twitter.util.Future
+import com.twitter.util.Duration
 
 object ServicesModule extends TwitterModule with Logging {
 
@@ -21,7 +27,13 @@ object ServicesModule extends TwitterModule with Logging {
   }
 
   override def configure: Unit = {
+
+    bindSingleton[TimeProvider].to[DefaultTimeProvider]
+
+    bindSingleton[OrganizationDao]
+
     bindSingleton[OrganizationService.FutureIface].to[OrganizationServiceImpl]
+
   }
 
   private[this] def provideServices(injector: com.twitter.inject.Injector) = Map( //s"${namespace}/oauth2" -> injector.instance[OAuth2Service.FutureIface],
@@ -30,10 +42,10 @@ object ServicesModule extends TwitterModule with Logging {
 
   def services(injector: com.twitter.inject.Injector) = {
     val rand = new scala.util.Random
+
     provideServices(injector).map { kv =>
       val (name, service) = kv
       val anounce = s"${zook(name)}!" + Math.abs(rand.nextInt)
-
       ThriftMux.server.serveIface(":*", service).announce(anounce)
     }.toSeq
   }
@@ -43,4 +55,20 @@ object ServicesModule extends TwitterModule with Logging {
     //ogger info s"LOADING CONFIG FROM: ${env}"
     ConfigFactory load env
   }
+
+  @Provides @Singleton
+  private[this] def getConnection(@Inject() config: Config): Client with Transactions = {
+    val client = Mysql.client
+      .withCredentials(config.getString("mysql.username"), config.getString("mysql.password"))
+      .configured(DefaultPool.Param(
+        low = 5,
+        high = Int.MaxValue,
+        idleTime = Duration.Top,
+        bufferSize = 0,
+        maxWaiters = Int.MaxValue
+      ))
+
+    client.withDatabase(config.getString("mysql.database")).newRichClient(config.getString("mysql.host"))
+  }
+
 }

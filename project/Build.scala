@@ -36,6 +36,8 @@ object RbacProject extends Build {
     .settings(libraryDependencies ++= commonDependency)
     .settings(libraryDependencies ++= twttrDependency)
     .settings(libraryDependencies ++= thriftDependency)
+    .settings(libraryDependencies ++= mysqlDependency)
+
 
   lazy val thrift = Project("rbac-thrift", file("rbac-thrift"))
     .settings(basicSettings: _*)
