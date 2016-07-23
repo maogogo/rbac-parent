@@ -46,7 +46,9 @@ object Dependencies {
     "com.twitter" %% "finagle-thrift" % finagleVersion,
     "com.twitter" %% "finagle-thriftmux" % finagleVersion,
     "com.twitter" %% "finagle-stats" % finagleVersion,
-    "com.twitter" %% "finagle-serversets" % finagleVersion,
+    "com.twitter" %% "finagle-serversets" % finagleVersion excludeAll(
+      ExclusionRule(organization = "org.slf4j", name = "slf4j-jdk14"),
+      ExclusionRule(organization = "org.slf4j", name = "slf4j-log4j12"), ExclusionRule(organization = "log4j", name = "log4j")),
     "com.twitter.inject" %% "inject-core" % injectVersion,
     "com.twitter.inject" %% "inject-server" % injectVersion,
     "com.twitter.inject" %% "inject-thrift-client" % injectVersion
@@ -61,6 +63,10 @@ object Dependencies {
   val mysqlDependency = Seq(
     "com.twitter" %% "finagle-mysql" % finagleVersion,
     "mysql" % "mysql-connector-java" % mysqlVersion
+  )
+
+  val solrDependency = Seq(
+    "jp.sf.amateras.solr.scala" %% "solr-scala-client" % "0.0.12"
   )
 
   val thriftDependency = Seq(

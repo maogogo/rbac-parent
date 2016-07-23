@@ -3,11 +3,18 @@ package com.maogogo.rbac.organization
 import com.maogogo.rbac.thrift._
 import com.twitter.util.Future
 import javax.inject.Inject
+import org.slf4j.LoggerFactory
 
 class OrganizationServiceImpl @Inject() (dao: OrganizationDao) extends OrganizationService.FutureIface {
 
+  val log = LoggerFactory.getLogger(getClass)
+
   def hi(name: String): Future[String] = {
-    dao.find().map { x =>
+
+    log.info("========>>>" + name)
+    dao.find(name).map { x =>
+      x.foreach { println }
+      log.info("========name>>>" + x.size)
       "hello : " + x.size
     }
 

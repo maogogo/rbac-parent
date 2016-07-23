@@ -12,6 +12,7 @@ import com.twitter.finagle.exp.mysql.{ Client, Transactions }
 import com.maogogo.rbac.common.timer._
 import com.twitter.util.Future
 import com.twitter.util.Duration
+import jp.sf.amateras.solr.scala._
 
 object ServicesModule extends TwitterModule with Logging {
 
@@ -29,6 +30,8 @@ object ServicesModule extends TwitterModule with Logging {
   override def configure: Unit = {
 
     bindSingleton[TimeProvider].to[DefaultTimeProvider]
+
+    bindSingleton[OrganizationIndexer]
 
     bindSingleton[OrganizationDao]
 
@@ -69,6 +72,11 @@ object ServicesModule extends TwitterModule with Logging {
       ))
 
     client.withDatabase(config.getString("mysql.database")).newRichClient(config.getString("mysql.host"))
+  }
+
+  @Provides @Singleton
+  def provideSolrClient(): SolrClient = {
+    new SolrClient(provideConfig().getString("solr.client"))
   }
 
 }
