@@ -45,12 +45,14 @@ trait BaseDao {
 
     def asInt = asOptionInt[Int](x => x).getOrElse(0)
 
-    def asLong[T](method: Long => T) = as[Long, T]({
+    def asOptionLong[T](method: Long => T) = as[Long, T]({
       case LongValue(v) => Option(method(v))
       case IntValue(v) => Option(method(v))
     })
 
-    def asLong = asLong[Long](x => x)
+    def asOptionLong = asOptionLong[Long](x => x)
+
+    def asLong = asOptionLong[Long](x => x).getOrElse(0l)
 
     def asTimestamp[T](method: Long => T) = as[Long, T]({
       case timestampValueLocal(v) => Option(method(v.getTime))

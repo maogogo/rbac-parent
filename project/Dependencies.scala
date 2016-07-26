@@ -27,10 +27,13 @@ object Dependencies {
     "spray repo" at "http://repo.spray.io"
   )
 
+  val utilDependency = Seq(
+    "com.google.guava" % "guava" % guavaVersion
+  )
+
   val commonDependency = Seq(
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.scala-lang" % "scala-compiler" % "2.11.8",
-    "com.google.guava" % "guava" % guavaVersion,
     "org.slf4j" % "slf4j-api" % slf4jVersion,
     "ch.qos.logback" % "logback-core" % logbackVersion,
     "ch.qos.logback" % "logback-classic" % logbackVersion,

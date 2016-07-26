@@ -6,39 +6,36 @@ import com.twitter.util.Future
 import com.maogogo.rbac.thrift.Organization
 import com.maogogo.rbac.common.utils.RegUtil
 import com.twitter.inject.Logging
+import com.maogogo.rbac.common.index.BaseIndexer
+import org.slf4j.LoggerFactory
 
-class OrganizationIndexer @Inject() (solrClient: SolrClient) extends Logging {
+class OrganizationIndexer @Inject() (solrClient: SolrClient) extends BaseIndexer {
 
-  def saveOrUpdate(docs: Any): Future[Unit] = {
-    Future.value(solrClient.add(docs))
+  val log = LoggerFactory.getLogger(getClass)
+
+  val querys = Seq("organization_name", "organization_code", "parent_code")
+
+  def saveOrUpdate(req: Organization): Future[Unit] = {
+
+    val doc = Map(
+      "id" -> req.id.getOrElse(""),
+      "organization_name" -> req.organizationName,
+      "organization_code" -> req.organizationCode,
+      "parent_code" -> req.parentCode
+    )
+
+    Future.value(solrClient.add(doc))
   }
 
   def query(word: String): Future[Seq[Organization]] = {
-    val words = word.split("\\w+").filter { _.nonEmpty }.map {
-      case x if RegUtil.matches(x, RegUtil.IntegerPattern) => s"*${x}*"
-      case y => y
-    }.zipWithIndex
 
-    val querys = Seq("organization_name", "organization_code", "parent_code")
-    //val querys = Map("organization_name" -> words, "organization_code" -> words, "parent_code" -> words)
+    val params = getParams(word, querys)
 
-    val paramsQuery = querys.flatMap { q =>
-      words.map { f =>
-        s"(${q}:$$${q}_${f._2}$$)"
-      }
-    }.mkString(" OR ")
+    log.info("word : " + word)
+    log.info("paramsQuery : " + params._1)
+    log.info("paramsMap : " + params._2)
 
-    val paramsMap = querys.flatMap { q =>
-      words.map { f =>
-        s"${q}_${f._2}" -> f._1
-      }
-    }.toMap
-
-    info("word : " + word)
-    info("paramsQuery : " + paramsQuery)
-    info("paramsMap : " + paramsMap)
-
-    Future.value(solrClient.query(paramsQuery).getResultAsMap(paramsMap).documents.map { doc =>
+    Future.value(solrClient.query(params._1).getResultAsMap(params._2).documents.map { doc =>
       Organization(
         id = Some(doc("id").asInstanceOf[String]),
         organizationName = doc("organization_name").asInstanceOf[String],

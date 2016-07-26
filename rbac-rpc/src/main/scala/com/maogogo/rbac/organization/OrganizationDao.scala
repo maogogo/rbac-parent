@@ -7,35 +7,36 @@ import com.maogogo.rbac.common.dao.BaseDao
 import com.twitter.finagle.exp.mysql._
 import com.maogogo.rbac.common.dao.Schema
 import jp.sf.amateras.solr.scala._
+import com.maogogo.rbac.common.timer.TimeProvider
 
-class OrganizationDao @Inject() (client: Client, indexer: OrganizationIndexer) extends BaseDao {
+class OrganizationDao @Inject() (client: Client, timer: TimeProvider) extends BaseDao {
 
-  def find(word: String): Future[Seq[Organization]] = {
+  def saveOrUpdate(req: Organization, owner: String): Future[Int] = {
+    val sql = s"""insert into ${Schema.RbacOrganization} (id, orgaization_name, reganization_cod, parent_code, record_status, 
+                record_created, record_createdby) values(?, ?, ?, ?, ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE organization_name=?, organization_code=?, 
+                parent_code=?, record_status=?, record_mofied=?, record_modified=?"""
+
+    client.prepare(sql)(req.id, req.organizationName, req.organizationCode, req.parentCode, "",
+      timer.timestamp(), owner, req.organizationName, req.organizationCode, req.parentCode,
+      req.status.getOrElse(RecordStatus.Active).getValue(), timer.timestamp(), owner).map { executeUpdate }
+
+  }
+
+  def delete(ids: Seq[String]): Future[Int] = {
+    val sql = s"""update ${Schema.RbacOrganization} set record_status=? where 
+                id in (${ids.mkString("'", "','", "'")}) and record_status=?"""
+    client.prepare(sql)().map { executeUpdate }
+  }
+
+  def findOne(id: String): Future[Option[Organization]] = {
+    val sql = s"select * from ${Schema.RbacOrganization} where id=?"
+    client.prepare(sql)(id).map { result { rowToOrganization } }
+  }
+
+  def findAll(owner: String): Future[Seq[Organization]] = {
     val sql = s"select * from ${Schema.RbacOrganization}"
-
-    indexer.query(word)
-
-    //    val params = Map(
-    //      "phone" -> Seq("1", "2").map(_ + "*"))
-    //
-    //    val queryPattern = params.keys.map { k => s"(${k}:$$${k}$$)" }.mkString(" OR ")
-
-    //    solrClient.add(Map("id" -> "003", "organization_name" -> "北京石景山714499258支行", "organization_code" -> "336677",
-    //      "parent_code" -> "114488", "status" -> "99")).commit()
-    //
-    //    val result = solrClient.query("organization_name:$name$ or parent_code:$code$")
-    //      .getResultAsMap(Map("name" -> "北京44", "code" -> "*22*"))
-    //      .documents.map { doc =>
-    //        Organization(
-    //          id = Some(doc("id").asInstanceOf[String]),
-    //          organizationName = doc("organization_name").asInstanceOf[String],
-    //          organizationCode = doc("organization_code").asInstanceOf[String],
-    //          parentCode = doc("parent_code").asInstanceOf[String]
-    //        )
-    //      }
-    //Future.value(result)
-
-    //client.prepare(sql)().map { resultSet { rowToOrganization } }
+    client.prepare(sql)().map { resultSet { rowToOrganization } }
   }
 
   private[this] def rowToOrganization(row: Row): Option[Organization] = {

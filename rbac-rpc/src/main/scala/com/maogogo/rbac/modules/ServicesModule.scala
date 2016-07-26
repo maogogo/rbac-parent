@@ -13,6 +13,9 @@ import com.maogogo.rbac.common.timer._
 import com.twitter.util.Future
 import com.twitter.util.Duration
 import jp.sf.amateras.solr.scala._
+import com.maogogo.rbac.user.UserInfoIndexer
+import com.maogogo.rbac.user.UserInfoDao
+import com.maogogo.rbac.user.UserInfoServiceImpl
 
 object ServicesModule extends TwitterModule with Logging {
 
@@ -32,15 +35,19 @@ object ServicesModule extends TwitterModule with Logging {
     bindSingleton[TimeProvider].to[DefaultTimeProvider]
 
     bindSingleton[OrganizationIndexer]
+    bindSingleton[UserInfoIndexer]
 
     bindSingleton[OrganizationDao]
+    bindSingleton[UserInfoDao]
 
     bindSingleton[OrganizationService.FutureIface].to[OrganizationServiceImpl]
+    bindSingleton[UserInfoService.FutureIface].to[UserInfoServiceImpl]
 
   }
 
   private[this] def provideServices(injector: com.twitter.inject.Injector) = Map( //s"${namespace}/oauth2" -> injector.instance[OAuth2Service.FutureIface],
-    s"/organization" -> injector.instance[OrganizationService.FutureIface]
+    s"/organization" -> injector.instance[OrganizationService.FutureIface],
+    s"/userinfo" -> injector.instance[UserInfoService.FutureIface]
   )
 
   def services(injector: com.twitter.inject.Injector) = {
