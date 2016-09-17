@@ -12,13 +12,16 @@ class UserInfoDao @Inject() (client: Client, timer: TimeProvider) extends BaseDa
 
   def saveOrUpdate(req: UserInfo, owner: String): Future[Int] = {
 
-    val sql = """INSERT INTO rbac.rbac_userinfo (id, user_name, user_password, cellphone, cellphone_active, email, 
-            email_active, last_login_time, error_times, record_status, record_created, record_createdby, record_modified, 
-            record_modifiedby, record_notes) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?,?, ?, ?) ON DUPLICATE KEY UPDATE 
-            user_name=?, user_password=?, cellphone=?, cellphone_active=?, email=?, email_active=?, last_login_time=?, 
+    val sql = s"""INSERT INTO ${Schema.RbacRoleInfo} (id, user_name, user_password, cellphone, cellphone_active, email, 
+            email_active, last_login_time, error_times, record_status, record_created, record_createdby, record_notes) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE user_name=?, user_password=?, cellphone=?, 
+            cellphone_active=?, email=?, email_active=?, last_login_time=?, 
             error_times=?, record_status=?, record_modified=?, record_modifiedby=? """
 
-    client.prepare(sql)().map { executeUpdate }
+    client.prepare(sql)(req.id, req.userName, req.userPasswd, req.cellPhone, req.cellPhoneActive, req.email, req.emailActive,
+      req.lastLoginTime, req.errorTimes, req.status, req.created, req.createdBy, "",
+      req.userName, req.userPasswd, req.cellPhone, req.cellPhoneActive, req.email, req.emailActive, req.lastLoginTime,
+      req.errorTimes, req.status, req.modified, req.modifiedBy).map { executeUpdate }
   }
 
   def findOne(id: String): Future[Option[UserInfo]] = {
@@ -33,9 +36,9 @@ class UserInfoDao @Inject() (client: Client, timer: TimeProvider) extends BaseDa
 
   def rowToUserInfo(row: Row): Option[UserInfo] = {
     Some(UserInfo(id = row("id").asOptionString, userName = row("user_name").asString,
-      userPasswd = row("user_password").asString, cellPhone = row("cellPhone").asOptionString,
-      email = row("email").asOptionString, cellPhoneActive = row("cellPhone_active").asOptionString,
-      emailActive = row("email_active").asOptionString, lastLoginTime = row("cellPhone").asLong,
+      userPasswd = row("user_password").asString, cellPhone = row("cellphone").asOptionString,
+      email = row("email").asOptionString, cellPhoneActive = row("cellphone_active").asOptionString,
+      emailActive = row("email_active").asOptionString, lastLoginTime = row("last_login_time").asLong,
       errorTimes = row("error_times").asInt))
   }
 
