@@ -9,10 +9,7 @@ class OrganizationEndpoints @Inject() (service: OrganizationService.FutureIface)
 
   def endpoints = hi
 
-  val hi: Endpoint[String] = get("hi") {
-
-    println("service ===>>>" + service)
-
-    Ok(service.hi("Toan"))
+  val hi: Endpoint[String] = get("hi" / param("name")) { name: String =>
+    Ok(service.hi(name))
   }
 }
