@@ -8,52 +8,68 @@
 		<encoder charset="UTF-8">
 			<!-- <pattern>%date %.-3level %-25X{traceId} %-25logger{0} %msg%n</pattern> -->
 			<!-- [%-5level] %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n -->
-			<pattern>[%level] - %date - %logger#%line %msg%n</pattern>
-
+			<pattern>[%-5level] - %date [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
 			<!-- <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern> -->
 		</encoder>
 	</appender>
 
-	<!-- <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
-		<Encoding>UTF-8</Encoding> <File>logs/test.log</File> <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> 
-		<FileNamePattern>logs/test-%d{yyyy-MM-dd}.log </FileNamePattern> <MaxHistory>10</MaxHistory> 
-		<TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"> 
-		<MaxFileSize>5MB</MaxFileSize> </TimeBasedFileNamingAndTriggeringPolicy> 
-		</rollingPolicy> <layout class="ch.qos.logback.classic.PatternLayout"> <pattern>[%level] 
-		- %date - %logger#%line %msg%n</pattern> </layout> </appender> -->
-
-	<appender name="INFOLOGS"
+	<appender name="CONSOLELOGS"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
-		<File>logs/info.log</File>
+
+		<file>logs/info.log</file>
 		<!-- 过滤器，只记录INFO级别的日志 -->
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>INFO</level>
+			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- 按天回滚 daily -->
-			<fileNamePattern>logs/info-%d{yyyy-MM-dd}.log
+			<fileNamePattern>logs/console-%d{yyyy-MM-dd}.log
 			</fileNamePattern>
 			<!-- 日志最大的历史 60天 -->
-			<maxHistory>10</maxHistory>
+			<maxHistory>30</maxHistory>
 		</rollingPolicy>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger -
-				%msg%n</pattern>
-		</layout>
+		<encoder>
+			<pattern>[%-5level] - %date [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
+    </encoder>
+	</appender>
+
+	<appender name="ERRORLOGS"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<file>logs/error.log</file>
+		<!-- 过滤器，只记录INFO级别的日志 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 按天回滚 daily -->
+			<fileNamePattern>logs/error-%d{yyyy-MM-dd}.log
+			</fileNamePattern>
+			<!-- 日志最大的历史 60天 -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>[%-5level] - %date [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
+    </encoder>
 	</appender>
 
 	<!-- Per Package Config -->
-	<logger name="com.twitter" level="INFO" additivity="false" />
+	<logger name="com.twitter" level="ERROR" additivity="false" />
 	<logger name="org.apache.zookeeper" level="ERROR" additivity="false" />
 	<logger name="com.zaxxer.hikari" level="ERROR" additivity="false" />
+	<logger name="ch.qos" level="ERROR" additivity="false" />
+	<logger name="io.netty" level="ERROR" additivity="false" />
 	<!-- <logger name="ch.qos.logback" level="ERROR" /> -->
 
 	<!-- Root Logger -->
 	<root level="DEBUG">
 		<appender-ref ref="STDOUT" />
-		<appender-ref ref="INFOLOGS" />
+		<appender-ref ref="CONSOLELOGS" />
+		<appender-ref ref="ERRORLOGS" />
 	</root>
+
 </configuration>

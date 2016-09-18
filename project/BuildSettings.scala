@@ -6,15 +6,12 @@ import com.twitter.scrooge.ScroogeSBT.autoImport._
 
 object BuildSettings {
 
-  //val name = "rbac-parent"
-  //val version = "0.0.1-SNAPSHOT"
-
   lazy val basicSettings = seq(
     scalaVersion := "2.11.8",
     version := "0.0.1-SNAPSHOT",
     organization := "com.maogogo",
     resolvers ++= Dependencies.repositories
-    //enablePlugins(JavaAppPackaging)
+    //enablePlugins(JavaServerAppPackaging)
   )
 
   lazy val shellSettings = seq(

@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
-import com.typesafe.sbt.SbtScalariform.scalariformSettings
 import com.typesafe.sbt.packager.archetypes._
+import com.typesafe.sbt.SbtScalariform._
 
 
 object RbacProject extends Build {
@@ -14,44 +14,33 @@ object RbacProject extends Build {
   }
 
   lazy val root = Project("rbac", file("."))
-    .aggregate(thrift, rest, rpc)
-    .settings(basicSettings: _*)
-    .settings(scalariformSettings: _*)
+    .aggregate(thrift, rest, rpc, common)
+    .settings(defaultScalariformSettings: _*)
 
-  lazy val util = Project("rbac-util", file("rbac-util"))
+  lazy val common = Project("rbac-common", file("rbac-common"))
     .settings(basicSettings: _*)
-    .settings(scalariformSettings: _*)
-    .settings(libraryDependencies ++= utilDependency)
+    .settings(libraryDependencies ++= commonDependency)
+    .settings(libraryDependencies ++= serverDependency)
+    .settings(libraryDependencies ++= mysqlDependency)
+    .settings(libraryDependencies ++= solrDependency)
+    .settings(libraryDependencies ++= redisDependency)
+    .settings(libraryDependencies ++= mongoDependency)
+    .settings(libraryDependencies ++= csvDependency)
 
   lazy val rest = Project("rbac-rest", file("rbac-rest"))
-    .dependsOn(thrift).dependsOn(util)
+    .dependsOn(thrift).dependsOn(common)
     .settings(basicSettings: _*)
-    .settings(scalariformSettings: _*)
     .enablePlugins(JavaServerAppPackaging)
-    .settings(libraryDependencies ++= commonDependency)
-    .settings(libraryDependencies ++= utilDependency)
-    .settings(libraryDependencies ++= twttrDependency)
-    .settings(libraryDependencies ++= thriftDependency)
     .settings(libraryDependencies ++= finchDependency)
 
   lazy val rpc = Project("rbac-rpc", file("rbac-rpc"))
-    .dependsOn(thrift).dependsOn(util)
+    .dependsOn(thrift).dependsOn(common)
     .settings(basicSettings: _*)
-    .settings(scalariformSettings: _*)
     .enablePlugins(JavaServerAppPackaging)
-    .settings(libraryDependencies ++= commonDependency)
-    .settings(libraryDependencies ++= utilDependency)
-    .settings(libraryDependencies ++= twttrDependency)
-    .settings(libraryDependencies ++= thriftDependency)
-    .settings(libraryDependencies ++= mysqlDependency)
-    .settings(libraryDependencies ++= solrDependency)
 
   lazy val thrift = Project("rbac-thrift", file("rbac-thrift"))
     .settings(basicSettings: _*)
     .settings(thriftSettings: _*)
-    .settings(libraryDependencies ++= commonDependency)
-    .settings(libraryDependencies ++= utilDependency)
-    .settings(libraryDependencies ++= twttrDependency)
     .settings(libraryDependencies ++= thriftDependency)
 
 }
